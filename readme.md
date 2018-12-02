@@ -41,6 +41,7 @@ road_detection.py uses the two classes to perform both lane detection and car
 detection. Pass it a video file as an argument to run it.
 
 In the project folder, self-driving-toolkit, run:
+
 python road_detection.py --vidfile example.mp4
 
 A window will pop up and begin to play the processed video showing green lines
@@ -53,6 +54,7 @@ lane_detection.py uses performs lane detection only.
 Pass it a video file as an argument to run it.
 
 In the project folder, self-driving-toolkit, run:
+
 python lane_detection.py --vidfile example.mp4
 
 A window will pop up and begin to play the processed video showing green lines
@@ -65,6 +67,7 @@ Dependencies:
 - OpenCV
 - Tensorflow >= 1.9.0
 - A test video file
+
 Tensorflow Object Detection API dependencies:
 - Protobuf 3.0.0
 - Python-tk
