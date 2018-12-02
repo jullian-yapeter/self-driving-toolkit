@@ -5,7 +5,7 @@ from classes.roadDetector import RoadDetector
 def main():
     objectDetector = ObjectDetector()
     objectDetector.loadModel()
-    #objectDetector.downloadModel()
+    objectDetector.downloadModel() # Please comment out after the first time running this
     roadDetector = RoadDetector(objectDetector)
     roadDetector.runRoadDetector()
 

@@ -15,9 +15,10 @@ For car detection, I opted to use Tensorflow's object detection API with a
 Faster RCNN model pre-trained on the COCO dataset. I used Faster RCNN for its
 balanced attributes of speed and accuracy. Detections are filtered based
 on a confidence threshold and detected class name (only show detected cars). I
-included the downloaded model in this repository, but I also included a download
-function that allows you to pull the model from Tensorflow's online source
-(Simply comment in the download function on line 8 of road_detection.py).
+did not include the Faster RCNN model in this repository, but I did include a
+download function that allows you to pull the model from Tensorflow's online
+source (Simply comment out the download function on line 8 of road_detection.py
+after the first time running it).
 
 I was using the CPU version of Tensorflow due to my lack of resources. Therefore,
 the detections are relatively slow. However, I included a video of what it would
