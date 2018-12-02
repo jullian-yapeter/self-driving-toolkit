@@ -1,35 +1,18 @@
 import os
-import sys
-import math
-import time
-import argparse
-import tarfile
-import zipfile
-from collections import defaultdict
-from io import StringIO
 import numpy as np
-import matplotlib
-from matplotlib import pyplot as plt
-from multiprocessing import Process, Manager, Queue, Pool
 import cv2
-import tensorflow as tf
-from PIL import ImageColor
-from PIL import Image
-from PIL import ImageDraw
-import matplotlib.image as mpimg
-import six.moves.urllib as urllib
-from distutils.version import StrictVersion
-from object_detection.utils import ops as utils_ops
-from object_detection.utils import label_map_util
-from object_detection.utils import visualization_utils as vis_util
+import argparse
+import time
+from multiprocessing import Process, Manager, Queue, Pool
 
+# Performs lane detection and brings in an objectDetector to detect cars
 class RoadDetector:
 
     args = None
     objectDetector = None # Uses object of ObjectDetector class to detect cars
 
     def __init__(self,od):
-        self.objectDetector = od
+        self.objectDetector = od # Pass in initialized objectDetector
 
     # Retrieve user inputted video file path
     def argparser(self,):
@@ -55,7 +38,7 @@ class RoadDetector:
         clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
         cl = clahe.apply(l)
         limg = cv2.merge((cl,a,b))
-        claheimg = cv2.cvtColor(limg, cv2.COLOR_BGR2LAB)
+        claheimg = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
         return claheimg
 
     # Create a trapezoidal region of interest, and mask out everything outside the ROI
@@ -109,13 +92,18 @@ class RoadDetector:
 
     # Use pixel value thresholding to isolate white and yellow pixels
     # The assumption is that lane lines are always either white or yellow in colour
-    def maskWhiteYellow(self, grayimg, hsvimg):
+    def maskWhiteYellow(self, grayimg, rgbimg, hlsimg):
+        # Range of yellow colour in HLS space
+        hlsyellowLow = np.array([20, 120, 80], dtype = "uint8")
+        hlsyellowHigh = np.array([45, 200, 255], dtype="uint8")
         # Range of yellow colour in HSV space
-        yellowLow = np.array([20, 100, 100], dtype = "uint8")
-        yellowHigh = np.array([30, 255, 255], dtype="uint8")
+        rgbyellowLow = np.array([100, 100, 100], dtype = "uint8")
+        rgbyellowHigh = np.array([45, 200, 255], dtype= "uint8")
         # Create masks for each colour
-        yellowMask = cv2.inRange(hsvimg, yellowLow, yellowHigh)
+        yellowMask1 = cv2.inRange(hlsimg, hlsyellowLow, hlsyellowHigh)
+        yellowMask2 = cv2.inRange(rgbimg, rgbyellowLow, rgbyellowHigh)
         whiteMask = cv2.inRange(grayimg, 200, 255) # Range of white in 1 channel
+        yellowMask = cv2.bitwise_or(yellowMask1, yellowMask2)
         # Fuse the two masks
         wyMask = cv2.bitwise_or(whiteMask, yellowMask)
         # Apply the mask
@@ -151,8 +139,9 @@ class RoadDetector:
         #claheimg = self.claheEqualization(img)
         detectimg = self.objectDetector.runObjectDetector(img)
         grayimg = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        hsvimg = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
-        maskedImg = self.maskWhiteYellow(grayimg, hsvimg)
+        rgbimg = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        hlsimg = cv2.cvtColor(rgbimg, cv2.COLOR_RGB2HLS)
+        maskedImg = self.maskWhiteYellow(grayimg, rgbimg, hlsimg)
         gaussimg = cv2.GaussianBlur(maskedImg,(5,5),0)
         cannyimg = self.cannyDetector(gaussimg)
         roi_image = self.regionOfInterest(cannyimg)
@@ -174,12 +163,14 @@ class RoadDetector:
             pass
         if raw_q.qsize() > 0:
             img = raw_q.get()
+            img = cv2.resize(img,(1280, 740))
             imshape = img.shape # Need shape of image to initialize opencv video writer
             writer = cv2.VideoWriter('road_detection_output.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 15, (imshape[1],imshape[0]), True)
         while True:
             if raw_q.qsize() > 0:
                 starttime = time.time()
                 img = raw_q.get()
+                img = cv2.resize(img,(1280, 740))
                 proc_img = self.processImg(img)
                 cv2.imshow('result',proc_img)
                 writer.write(proc_img)
