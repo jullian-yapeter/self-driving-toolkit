@@ -4,8 +4,10 @@ from classes.roadDetector import RoadDetector
 
 def main():
     objectDetector = ObjectDetector()
-    objectDetector.loadModel()
+    print "=== STARTED DOWNLOADING MODEL ==="
     objectDetector.downloadModel() # Please comment out after the first time running this
+    print "=== FINISHED DOWNLOADING MODEL ==="
+    objectDetector.loadModel()
     roadDetector = RoadDetector(objectDetector)
     roadDetector.runRoadDetector()
 
