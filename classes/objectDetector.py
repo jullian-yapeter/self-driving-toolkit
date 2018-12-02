@@ -98,6 +98,7 @@ class ObjectDetector:
         self.drawBoxes(img, box_coords)
         return img
 
+    # Run detection, filtering, and visualization
     def runObjectDetector(self,img):
         boxes, scores, classes = self.detect(img)
         boxes, scores, classes = self.filterBoxes(self.confThresh, boxes, scores, classes,[self.classID])

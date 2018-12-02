@@ -8,7 +8,7 @@ from multiprocessing import Process, Manager, Queue, Pool
 # Performs lane detection and brings in an objectDetector to detect cars
 class RoadDetector:
 
-    args = None
+    args = None # Store command line arguments
     objectDetector = None # Uses object of ObjectDetector class to detect cars
 
     def __init__(self,od):
@@ -96,7 +96,7 @@ class RoadDetector:
         # Range of yellow colour in HLS space
         hlsyellowLow = np.array([20, 120, 80], dtype = "uint8")
         hlsyellowHigh = np.array([45, 200, 255], dtype="uint8")
-        # Range of yellow colour in HSV space
+        # Range of yellow colour in RGB space
         rgbyellowLow = np.array([100, 100, 100], dtype = "uint8")
         rgbyellowHigh = np.array([45, 200, 255], dtype= "uint8")
         # Create masks for each colour
@@ -165,7 +165,7 @@ class RoadDetector:
             img = raw_q.get()
             img = cv2.resize(img,(1280, 740))
             imshape = img.shape # Need shape of image to initialize opencv video writer
-            writer = cv2.VideoWriter('road_detection_output.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 15, (imshape[1],imshape[0]), True)
+            writer = cv2.VideoWriter('road_detection_test.avi', cv2.VideoWriter_fourcc('M','J','P','G'), 15, (imshape[1],imshape[0]), True)
         while True:
             if raw_q.qsize() > 0:
                 starttime = time.time()
@@ -174,7 +174,7 @@ class RoadDetector:
                 proc_img = self.processImg(img)
                 cv2.imshow('result',proc_img)
                 writer.write(proc_img)
-                if cv2.waitKey(20) & 0xFF == ord('q'):
+                if cv2.waitKey(20) & 0xFF == ord('q'):  # Hit 'q' to quit anytime
                     break
             elif time.time() - starttime >= 1: # Stop the program 1 second after the video ends
                 break
