@@ -20,6 +20,7 @@ class RoadDetector:
         ap.add_argument("--vidfile", required = True, help = "Enter your test video file")
         self.args = vars(ap.parse_args())
 
+    # Read video and push images to queue
     def videocap(self,raw_q):
         self.argparser()
         cap = cv2.VideoCapture(self.args["vidfile"])
