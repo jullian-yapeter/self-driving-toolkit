@@ -1,11 +1,3 @@
-I'm Jullian, a third year Mechatronics student from the University of Waterloo
-with a passion for robotics, computer vision, and AI
-
-Solution:
-
-I chose to complete the self-driving coding challenge. For the challenge, I
-created a lane + car detection program.
-
 For lane detection, I used pure computer vision. Using colour range thresholding
 in multiple colour spaces, edge detection, Hough transform, ROI isolation, and
 contour finding techniques, I was able to detect white and yellow lane lines
